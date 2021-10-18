@@ -15,21 +15,20 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 
-sys.path.append("ext/HRNet-Facial-Landmark-Detection")
-from lib.config import config
-import lib.models as models
-from lib.datasets import get_dataset
-from lib.core import evaluation
-from lib.utils import transforms
+sys.path.append("ext/HRNet_Facial_Landmark_Detection")
+from demo.ext.HRNet_Facial_Landmark_Detection.lib.config import config
+import demo.ext.HRNet_Facial_Landmark_Detection.lib.models as models
+from demo.ext.HRNet_Facial_Landmark_Detection.lib.datasets import get_dataset
+from demo.ext.HRNet_Facial_Landmark_Detection.lib.core import evaluation
+from demo.ext.HRNet_Facial_Landmark_Detection.lib.utils import transforms
 
-from face import face
 
 class landmarks:
 
     def __init__(self, config=config):
 
         config.defrost()
-        config.merge_from_file("ext/HRNet-Facial-Landmark-Detection/experiments/wflw/face_alignment_wflw_hrnet_w18.yaml")
+        config.merge_from_file("../demo/ext/HRNet_Facial_Landmark_Detection/experiments/wflw/face_alignment_wflw_hrnet_w18.yaml")
         config.freeze()
 
         cudnn.benchmark = config.CUDNN.BENCHMARK
@@ -41,7 +40,7 @@ class landmarks:
         config.freeze()
 
         self.model = models.get_face_alignment_net(config)
-        state_dict = torch.load("ext/HRNet-Facial-Landmark-Detection/hrnetv2_pretrained/HR18-WFLW.pth")
+        state_dict = torch.load("../demo/ext/HRNet_Facial_Landmark_Detection/hrnetv2_pretrained/HR18-WFLW.pth")
         self.model.load_state_dict(state_dict, strict=False)
 
         gpus = list(config.GPUS)

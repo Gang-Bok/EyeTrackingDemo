@@ -16,13 +16,13 @@ import os
 import torch
 
 sys.path.append("ext/eth")
-from undistorter import Undistorter
-from KalmanFilter1D import Kalman1D
+from demo.undistorter import Undistorter
+from demo.KalmanFilter1D import Kalman1D
 
-from face import face
-from landmarks import landmarks
-from head import PnPHeadPoseEstimator
-from normalization import normalize
+from demo.face import face
+from demo.landmarks import landmarks
+from demo.head import PnPHeadPoseEstimator
+from demo.normalization import normalize
 
 class frame_processer:
 
@@ -71,7 +71,7 @@ class frame_processer:
             frames_read += 1
 
             # detect face
-            face_location = face.detect(img,  scale=0.25, use_max='SIZE')
+            face_location = face.detect(img, scale=0.25, use_max='SIZE')
 
             if len(face_location) > 0:
                 # use kalman filter to smooth bounding box position

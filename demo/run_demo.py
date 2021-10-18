@@ -20,10 +20,10 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import warnings
 warnings.filterwarnings("ignore")
 
-from monitor2 import monitor
-from camera import cam_calibrate
-from person_calibration import collect_data, fine_tune
-from frame_processor import frame_processer
+from demo.monitor2 import monitor
+from demo.camera import cam_calibrate
+from demo.person_calibration import collect_data, fine_tune
+from demo.frame_processor import frame_processer
 
 #################################
 # Start camera
@@ -42,12 +42,15 @@ cam_cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
 # calibrate camera
 cam_calib = {'mtx': np.eye(3), 'dist': np.zeros((1, 5))}
+
+
 if path.exists("calib_cam%d.pkl" % (cam_idx)):
     cam_calib = pickle.load(open("calib_cam%d.pkl" % (cam_idx), "rb"))
 else:
-    print("Calibrate camera once. Print pattern.png, paste on a clipboard, show to camera and capture non-blurry images in which points are detected well.")
+    print("Calibrate camera once. Print pattern.png, paste on a clipboard, showqq to camera and capture non-blurry images in which points are detected well.")
     print("Press s to save frame, c to continue, q to quit")
     cam_calibrate(cam_idx, cam_cap, cam_calib)
+
 
 #################################
 # Load gaze network
@@ -61,7 +64,7 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 # Create network
 sys.path.append("../src")
-from models import DTED
+from src.models import DTED
 gaze_network = DTED(
     growth_rate=32,
     z_dim_app=64,
@@ -112,7 +115,7 @@ subject = input('Enter subject name: ')
 data = collect_data(cam_cap, mon, calib_points=9, rand_points=4)
 # adjust steps and lr for best results
 # To debug calibration, set show=True
-gaze_network = fine_tune(subject, data, frame_processor, mon, device, gaze_network, k, steps=1000, lr=1e-5, show=False)
+gaze_network = fine_tune(subject, data, frame_processor, mon, device, gaze_network, k, steps=5000, lr=1e-5, show=False)
 
 #################################
 # Run on live webcam feed and

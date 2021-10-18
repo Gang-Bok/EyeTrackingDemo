@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 from os import path
 
-from camera import cam_calibrate
+from demo.camera import cam_calibrate
 
 
 #################################

@@ -16,13 +16,13 @@ import os
 
 import torch
 sys.path.append(os.pardir)
-from losses import GazeAngularLoss
+from src.losses import GazeAngularLoss
 
 directions = ['l', 'r', 'u', 'd']
-keys = {'u': 117,
-        'd': 100,
-        'l': 108,
-        'r': 114}
+keys = {'u': 0x260000,
+        'd': 0x280000,
+        'l': 0x250000,
+        'r': 0x270000}
 
 global THREAD_RUNNING
 global frames
@@ -98,7 +98,7 @@ def collect_data(cap, mon, calib_points=9, rand_points=5):
         direction = random.choice(directions)
         img, g_t = create_image(mon, direction, i, (0, 0, 0), grid=True, total=calib_points)
         cv2.imshow('image', img)
-        key_press = cv2.waitKey(0)
+        key_press = cv2.waitKeyEx()
         if key_press == keys[direction]:
             THREAD_RUNNING = False
             th.join()
@@ -123,7 +123,7 @@ def collect_data(cap, mon, calib_points=9, rand_points=5):
         direction = random.choice(directions)
         img, g_t = create_image(mon, direction, i, (0, 0, 0), grid=False, total=rand_points)
         cv2.imshow('image', img)
-        key_press = cv2.waitKey(0)
+        key_press = cv2.waitKeyEx()
         if key_press == keys[direction]:
             THREAD_RUNNING = False
             th.join()
@@ -172,7 +172,7 @@ def fine_tune(subject, data, frame_processor, mon, device, gaze_network, k, step
     vid_cap.release()
 
     n = len(data['image_a'])
-    assert n==130, "Face not detected correctly. Collect calibration data again."
+    assert n == 130, "Face not detected correctly. Collect calibration data again."
     _, c, h, w = data['image_a'][0].shape
     img = np.zeros((n, c, h, w))
     gaze_a = np.zeros((n, 2))

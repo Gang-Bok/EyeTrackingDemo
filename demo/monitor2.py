@@ -15,6 +15,7 @@ class monitor:
 
         # assumes in-build laptop camera, located centered and 10 mm above display
         # update this function for you camera and monitor using: https://github.com/computer-vision/takahashi2012cvpr
+        # desktop은 10mm보다 더 크게 해야한다
         x_cam_mm = ((int(self.w_pixels/2) - x_pixel)/self.w_pixels) * self.w_mm
         y_cam_mm = 10.0 + (y_pixel/self.h_pixels) * self.h_mm
         z_cam_mm = 0.0

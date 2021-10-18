@@ -9,8 +9,8 @@
 import sys
 import cv2
 
-sys.path.append("ext/mtcnn-pytorch/")
-from src import detect_faces, show_bboxes
+sys.path.append("ext/mtcnn_pytorch/")
+from demo.ext.mtcnn_pytorch.src import detect_faces, show_bboxes
 from PIL import Image
 
 class face:

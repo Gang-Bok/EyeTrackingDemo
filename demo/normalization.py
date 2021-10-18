@@ -26,7 +26,7 @@ SOFTWARE.
 import cv2
 import numpy as np
 
-from head import PnPHeadPoseEstimator
+from demo.head import PnPHeadPoseEstimator
 head_pose_estimator = PnPHeadPoseEstimator()
 
 def common_pre(entry, head_pose):
