@@ -78,6 +78,6 @@ async def accept(websocket, path):
             print(mon.monitor_to_camera(x_hat, y_hat))
         await websocket.send(str(x_hat) + ', ' + str(y_hat))
 
-start_server = websockets.serve(accept, '192.168.0.2', 443)
+start_server = websockets.serve(accept, 'localhost', 443)
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
