@@ -5,7 +5,7 @@ import websockets
 
 async def connect():
     # 웹 소켓에 접속을 합니다.
-    async with websockets.connect("ws://localhost:8000") as websocket:
+    async with websockets.connect("ws://localhost:9898") as websocket:
         # 10번을 반복하면서 웹 소켓 서버로 메시지를 전송합니다.
         for i in range(1, 10, 1):
             await websocket.send("hello!!")

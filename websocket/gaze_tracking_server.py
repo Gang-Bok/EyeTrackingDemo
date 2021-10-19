@@ -62,6 +62,7 @@ if torch.cuda.device_count() == 1:
 #####################################
 print('> Loading Finished!')
 
+
 async def accept(websocket, path):
     while True:
         data = await websocket.recv()
@@ -74,24 +75,8 @@ async def accept(websocket, path):
             data = jd['data']
             frame = cv2.imdecode(np.frombuffer(base64.b64decode(data.split(',')[1]), np.uint8), cv2.IMREAD_COLOR)
             x_hat, y_hat = frame_processer.process('gang', frame, mon, device, gaze_network, show=True)
-            # show point of regard on screen
-
-            display = np.ones((mon.h_pixels, mon.w_pixels, 3), np.float32)
-            h, w, c = patch.shape
-            display[0:h, int(mon.w_pixels / 2 - w / 2):int(mon.w_pixels / 2 + w / 2), :] = 1.0 * patch / 255.0
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            if type(g_n) is np.ndarray:
-                cv2.putText(display, '.', (x_pixel_gt, y_pixel_gt), font, 0.5, (0, 0, 0), 10, cv2.LINE_AA)
-            cv2.putText(display, '.', (int(x_pixel_hat), int(y_pixel_hat)), font, 0.5, (0, 0, 255), 10, cv2.LINE_AA)
-            cv2.namedWindow("por", cv2.WINDOW_NORMAL)
-            cv2.setWindowProperty("por", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-            cv2.imshow('por', display)
-
-            print(x_hat, y_hat)
-            mon_x, mon_y, _ = mon.monitor_to_camera(x_hat, y_hat)
             print(mon.monitor_to_camera(x_hat, y_hat))
-        await websocket.send(str(mon_x) + ',' + str(mon_y))
-
+        await websocket.send(str(x_hat) + ', ' + str(y_hat))
 
 start_server = websockets.serve(accept, '192.168.0.2', 443)
 asyncio.get_event_loop().run_until_complete(start_server)

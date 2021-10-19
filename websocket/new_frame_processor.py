@@ -54,13 +54,11 @@ class frame_processer:
         self.landmarks_detector = landmarks()
         self.head_pose_estimator = PnPHeadPoseEstimator()
 
-    def process(self, subject, img, mon, device, gaze_network, por_available=False, show=False):
-
+    def process(self, subject, img, mon, device, gaze_network, por_available=False, show=False, target=None):
+        # por is point of regard
         g_t = None
-        data = {'image_a': [], 'gaze_a': [], 'head_a': [], 'R_gaze_a': [], 'R_head_a': []}
         if por_available:
-            f = open('./%s_calib_target.pkl' % subject, 'rb')
-            targets = pickle.load(f)
+            targets = target
 
         frames_read = 0
         img = self.undistorter.apply(img)
@@ -188,11 +186,14 @@ class frame_processer:
                 'R_head_a': R_head_a,
             }
             if por_available:
+                return processed_patch, g_n, h_n, R_gaze_a, R_head_a
+                '''
                 data['image_a'].append(processed_patch)
                 data['gaze_a'].append(g_n)
                 data['head_a'].append(h_n)
                 data['R_gaze_a'].append(R_gaze_a)
                 data['R_head_a'].append(R_head_a)
+                '''
 
             if show:
 
@@ -223,7 +224,6 @@ class frame_processer:
                 x_pixel_hat, y_pixel_hat = np.ceil(np.real(output_tracked)), np.ceil(np.imag(output_tracked))
                 return x_pixel_hat, y_pixel_hat
 
-        print(1)
         return data
 
 
