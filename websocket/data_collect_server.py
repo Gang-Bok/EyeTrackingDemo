@@ -65,38 +65,37 @@ gaze_network.load_state_dict(ted_weights)
 mon = monitor()
 lr = 1e-5
 steps = 5000
+cnt = 0
 print("----------------------Loading Finish---------------------")
 
 async def accept(websocket, path):
-    collect_data = {'frames': [], 'g_t': []}
-    cam_calib = pickle.load(open("calib_cam0.pkl", "rb"))
+    global cnt
+    cam_calib = pickle.load(open("calib_cam.pkl", "rb"))
     frame_processor = frame_processer(cam_calib)
-    DATA_LEN = 14
     subject = 'gang'
     data = {'image_a': [], 'gaze_a': [], 'head_a': [], 'R_gaze_a': [], 'R_head_a': []}
     while True:
-        data = await websocket.recv()
-        json_data = json.loads(data)
+        ws_data = await websocket.recv()
+        json_data = json.loads(ws_data)
         frame_data = json_data['frame']
         g_x = json_data['x']
         g_y = json_data['y']
         frame = cv2.imdecode(np.frombuffer(base64.b64decode(frame_data.split(',')[1]), np.uint8), cv2.IMREAD_COLOR)
-        collect_data['frames'].append(frame)
-        collect_data['g_t'].append((g_x, g_y))
-        print(len(collect_data['frames']))
-        if len(collect_data['frames']) == DATA_LEN:
-            for frame, gaze_target in zip(collect_data['frames'], collect_data['g_t']):
-                processed_patch, g_n, h_n, R_gaze_a, R_head_a = frame_processor.process('gang', frame, mon,
-                                                                                        device, gaze_network,
-                                                                                        por_available=True, show=False,
-                                                                                        target=gaze_target
-                                                                                        )
-                data['image_a'].append(processed_patch)
-                data['gaze_a'].append(g_n)
-                data['head_a'].append(h_n)
-                data['R_gaze_a'].append(R_gaze_a)
-                data['R_head_a'].append(R_head_a)
+        try:
+            processed_patch, g_n, h_n, R_gaze_a, R_head_a = frame_processor.process('gang', frame, mon,
+                                                                                    device, gaze_network,
+                                                                                    por_available=True, show=False,
+                                                                                    target=(g_x, g_y))
+            cnt += 1
+        except:
+            await websocket.send('failed to make image')
+        data['image_a'].append(processed_patch)
+        data['gaze_a'].append(g_n)
+        data['head_a'].append(h_n)
+        data['R_gaze_a'].append(R_gaze_a)
+        data['R_head_a'].append(R_head_a)
 
+        if cnt == 14:
             n = len(data['image_a'])
             assert n == 130, "Face not detected correctly. Collect calibration data again."
             _, c, h, w = data['image_a'][0].shape

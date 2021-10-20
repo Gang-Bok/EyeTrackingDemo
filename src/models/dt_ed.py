@@ -86,8 +86,8 @@ class DTED(nn.Module):
 
     def linear(self, f_in, f_out):
         fc = nn.Linear(f_in, f_out)
-        nn.init.kaiming_normal(fc.weight.data)
-        nn.init.constant(fc.bias.data, val=0)
+        nn.init.kaiming_normal_(fc.weight.data)
+        nn.init.constant_(fc.bias.data, val=0)
         return fc
 
     def rotate_code(self, data, code, mode, fr=None, to=None):

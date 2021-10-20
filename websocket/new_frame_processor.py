@@ -58,14 +58,9 @@ class frame_processer:
         # por is point of regard
         g_t = None
         if por_available:
-            targets = target
+            g_t = target
 
-        frames_read = 0
-        img = self.undistorter.apply(img)
-        if por_available:
-            g_t = targets[frames_read]
-        frames_read += 1
-
+        # img = self.undistorter.apply(img)
         # detect face
         face_location = face.detect(img, scale=0.25, use_max='SIZE')
 
@@ -186,6 +181,7 @@ class frame_processer:
                 'R_head_a': R_head_a,
             }
             if por_available:
+                print(1)
                 return processed_patch, g_n, h_n, R_gaze_a, R_head_a
                 '''
                 data['image_a'].append(processed_patch)
@@ -223,7 +219,5 @@ class frame_processer:
                 output_tracked = self.kalman_filter_gaze[0].update(x_pixel_hat + 1j * y_pixel_hat)
                 x_pixel_hat, y_pixel_hat = np.ceil(np.real(output_tracked)), np.ceil(np.imag(output_tracked))
                 return x_pixel_hat, y_pixel_hat
-
-        return data
 
 
