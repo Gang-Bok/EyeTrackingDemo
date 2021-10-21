@@ -66,10 +66,14 @@ mon = monitor()
 lr = 1e-5
 steps = 5000
 cnt = 0
+frames = []
+targets = []
 print("----------------------Loading Finish---------------------")
 
+
 async def accept(websocket, path):
-    global cnt
+    global cnt, k
+    global frames, targets
     cam_calib = pickle.load(open("calib_cam.pkl", "rb"))
     frame_processor = frame_processer(cam_calib)
     subject = 'gang'
@@ -77,27 +81,32 @@ async def accept(websocket, path):
     while True:
         ws_data = await websocket.recv()
         json_data = json.loads(ws_data)
+        is_clicked = json_data['clicked']
+        if is_clicked:
+            print(cnt)
+            g_x = json_data['x']
+            g_y = json_data['y']
+            g_x, g_y, _ = mon.monitor_to_camera(g_x, g_y)
+            target = (g_x, g_y)
         frame_data = json_data['frame']
-        g_x = json_data['x']
-        g_y = json_data['y']
         frame = cv2.imdecode(np.frombuffer(base64.b64decode(frame_data.split(',')[1]), np.uint8), cv2.IMREAD_COLOR)
         try:
             processed_patch, g_n, h_n, R_gaze_a, R_head_a = frame_processor.process('gang', frame, mon,
                                                                                     device, gaze_network,
                                                                                     por_available=True, show=False,
-                                                                                    target=(g_x, g_y))
+                                                                                    target=target)
+            data['image_a'].append(processed_patch)
+            data['gaze_a'].append(g_n)
+            data['head_a'].append(h_n)
+            data['R_gaze_a'].append(R_gaze_a)
+            data['R_head_a'].append(R_head_a)
             cnt += 1
         except:
+            print('failed')
             await websocket.send('failed to make image')
-        data['image_a'].append(processed_patch)
-        data['gaze_a'].append(g_n)
-        data['head_a'].append(h_n)
-        data['R_gaze_a'].append(R_gaze_a)
-        data['R_head_a'].append(R_head_a)
 
-        if cnt == 14:
+        if cnt == 140:
             n = len(data['image_a'])
-            assert n == 130, "Face not detected correctly. Collect calibration data again."
             _, c, h, w = data['image_a'][0].shape
             img = np.zeros((n, c, h, w))
             gaze_a = np.zeros((n, 2))
@@ -173,7 +182,7 @@ async def accept(websocket, path):
                     output_dict = gaze_network(input_dict_valid)
                     valid_loss = loss(input_dict_valid, output_dict).cpu()
                     message = '%04d> Train: %.2f, Validation: %.2f' % (i + 1, train_loss.item(), valid_loss.item())
-                    websocket.send(message)
+                    await websocket.send(message)
                     print(message)
             torch.save(gaze_network.state_dict(), '%s_gaze_network.pth.tar' % subject)
             torch.cuda.empty_cache()

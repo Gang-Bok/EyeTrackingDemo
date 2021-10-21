@@ -57,10 +57,16 @@ class frame_processer:
     def process(self, subject, img, mon, device, gaze_network, por_available=False, show=False, target=None):
         # por is point of regard
         g_t = None
+
+        '''
+        cv2.imshow('test', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+        '''
+
         if por_available:
             g_t = target
-
-        # img = self.undistorter.apply(img)
+            img = self.undistorter.apply(img)
         # detect face
         face_location = face.detect(img, scale=0.25, use_max='SIZE')
 
@@ -181,7 +187,6 @@ class frame_processer:
                 'R_head_a': R_head_a,
             }
             if por_available:
-                print(1)
                 return processed_patch, g_n, h_n, R_gaze_a, R_head_a
                 '''
                 data['image_a'].append(processed_patch)
