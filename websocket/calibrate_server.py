@@ -48,6 +48,7 @@ async def accept(websocket, path):
                         img_points.append(corners)
                         obj_points.append(pts)
                         frames.append(frame)
+                        await websocket.send('echo : image get')
                         continue
                     else:
                         # compute calibration matrices
@@ -64,8 +65,7 @@ async def accept(websocket, path):
                         print("Camera parameters:")
                         print(cam_calib)
                         pickle.dump(cam_calib, open("calib_cam.pkl", "wb"))
-
-        await websocket.send('echo : image get')
+                        await websocket.send('echo : finish calibrate')
 
 
 start_server = websockets.serve(accept, 'localhost', 9897)

@@ -74,7 +74,7 @@ print("----------------------Loading Finish---------------------")
 async def accept(websocket, path):
     global cnt, k
     global frames, targets
-    cam_calib = pickle.load(open("calib_cam.pkl", "rb"))
+    cam_calib = pickle.load(open("calib_cam0.pkl", "rb"))
     frame_processor = frame_processer(cam_calib)
     subject = 'gang'
     data = {'image_a': [], 'gaze_a': [], 'head_a': [], 'R_gaze_a': [], 'R_head_a': []}
@@ -186,8 +186,7 @@ async def accept(websocket, path):
                     print(message)
             torch.save(gaze_network.state_dict(), '%s_gaze_network.pth.tar' % subject)
             torch.cuda.empty_cache()
-        else:
-            await websocket.send('echo : image get')
+
 
 
 start_server = websockets.serve(accept, 'localhost', 9898)
