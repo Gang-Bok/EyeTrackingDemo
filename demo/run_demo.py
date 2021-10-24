@@ -82,7 +82,6 @@ gaze_network = DTED(
 assert os.path.isfile(ted_parameters_path)
 print('> Loading: %s' % ted_parameters_path)
 ted_weights = torch.load(ted_parameters_path)
-print(ted_weights.keys())
 if torch.cuda.device_count() == 1:
     if next(iter(ted_weights.keys())).startswith('module.'):
         ted_weights = dict([(k[7:], v) for k, v in ted_weights.items()])
