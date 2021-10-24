@@ -66,7 +66,7 @@ class frame_processer:
 
         if por_available:
             g_t = target
-            img = self.undistorter.apply(img)
+            # img = self.undistorter.apply(img)
         # detect face
         face_location = face.detect(img, scale=0.25, use_max='SIZE')
 
@@ -220,9 +220,10 @@ class frame_processer:
                 por_cam_z = 0.0
 
                 x_pixel_hat, y_pixel_hat = mon.camera_to_monitor(por_cam_x, por_cam_y)
-
                 output_tracked = self.kalman_filter_gaze[0].update(x_pixel_hat + 1j * y_pixel_hat)
                 x_pixel_hat, y_pixel_hat = np.ceil(np.real(output_tracked)), np.ceil(np.imag(output_tracked))
                 return x_pixel_hat, y_pixel_hat
+
+
 
 

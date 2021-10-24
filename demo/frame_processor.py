@@ -220,10 +220,11 @@ class frame_processer:
                     por_cam_z = 0.0
 
                     x_pixel_hat, y_pixel_hat = mon.camera_to_monitor(por_cam_x, por_cam_y)
-
+                    print(x_pixel_hat, y_pixel_hat)
                     output_tracked = self.kalman_filter_gaze[0].update(x_pixel_hat + 1j * y_pixel_hat)
                     x_pixel_hat, y_pixel_hat = np.ceil(np.real(output_tracked)), np.ceil(np.imag(output_tracked))
-
+                    print('--------')
+                    print(x_pixel_hat, y_pixel_hat)
                     # show point of regard on screen
                     display = np.ones((mon.h_pixels, mon.w_pixels, 3), np.float32)
                     h, w, c = patch.shape

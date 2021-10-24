@@ -30,7 +30,8 @@ frame_processer = frame_processer(cam_calib)
 #################################
 # Load gaze network
 #################################
-ted_parameters_path = '5000_gaze_network.pth.tar'
+ted_parameters_path = '../demo/18_gaze_network.pth.tar'
+maml_parameters_path = '../demo/demo_weights/weights_maml'
 k = 9
 
 # Set device
@@ -56,10 +57,26 @@ gaze_network = DTED(
 assert os.path.isfile(ted_parameters_path)
 print('> Loading: %s' % ted_parameters_path)
 ted_weights = torch.load(ted_parameters_path)
+'''
+print(ted_weights.keys())
 if torch.cuda.device_count() == 1:
     if next(iter(ted_weights.keys())).startswith('module.'):
         ted_weights = dict([(k[7:], v) for k, v in ted_weights.items()])
 #####################################
+
+# Load MAML MLP weights if available
+full_maml_parameters_path = maml_parameters_path +'/%02d.pth.tar' % k
+assert os.path.isfile(full_maml_parameters_path)
+print('> Loading: %s' % full_maml_parameters_path)
+maml_weights = torch.load(full_maml_parameters_path)
+ted_weights.update({  # rename to fit
+    'gaze1.weight': maml_weights['layer01.weights'],
+    'gaze1.bias':   maml_weights['layer01.bias'],
+    'gaze2.weight': maml_weights['layer02.weights'],
+    'gaze2.bias':   maml_weights['layer02.bias'],
+})
+'''
+gaze_network.load_state_dict(ted_weights)
 print('> Loading Finished!')
 
 
@@ -74,9 +91,12 @@ async def accept(websocket, path):
         else:
             data = jd['data']
             frame = cv2.imdecode(np.frombuffer(base64.b64decode(data.split(',')[1]), np.uint8), cv2.IMREAD_COLOR)
-            x_hat, y_hat = frame_processer.process('gang', frame, mon, device, gaze_network, show=True)
-            print(mon.monitor_to_camera(x_hat, y_hat))
-        await websocket.send(str(x_hat) + ', ' + str(y_hat))
+            try:
+                x_hat, y_hat = frame_processer.process('gang', frame, mon, device, gaze_network, show=True)
+                print(x_hat, y_hat)
+                await websocket.send(str(x_hat) + ', ' + str(y_hat))
+            except:
+                print('Error')
 
 start_server = websockets.serve(accept, 'localhost', 443)
 asyncio.get_event_loop().run_until_complete(start_server)
