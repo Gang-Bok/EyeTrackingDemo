@@ -13,9 +13,7 @@ few-shot gaze를 이용하여 EyeTracking 을 web에서 실행할 수 있도록 
 |2021.10.20| Data Collect Server에서 frame을 받을 때 바로 data로 변환하게 수정, 일부 바뀐 함수 수정
 |2021.10.21| Data Collect Server에서 만드는 데이터의 수를 늘려서 받는것에 맞추어 수정
 |2021.10.24| Data Collect, EyeTracking Server에서 calibrate 사용하지 않고 성능 테스트 관련 확인/ Calibrate 제거 가능성 높음
-## References
 
-Few-shot-gaze : https://github.com/NVlabs/few_shot_gaze
 
 
 ## Memo
@@ -36,3 +34,9 @@ Few-shot-gaze : https://github.com/NVlabs/few_shot_gaze
 #### 2021.10.23
 
 1. Client에서 시작할 때 여러가지 정보를 줘야한다. 카메라의 종류(노트북 내장, 혹은 웹캠), 디스플레이로부터 카메라 렌즈까지의 거리를 알 수 있으면 더 좋음 
+
+## References
+
+Few-shot-gaze : https://github.com/NVlabs/few_shot_gaze
+Frontend : https://github.com/okok0415/cheating_detection_frontend
+Backend : https://github.com/okok0415/cheating_detection_backend
